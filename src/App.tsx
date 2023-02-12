@@ -2,26 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import Form from './components/Form';
 import List from './components/List';
-import { Sub } from './types';
+import { Sub, SubsResponseFromApi } from './types';
 
 interface AppState {
   subs: Array<Sub>
   newSubsNumber: number
 }
 
-const INITIAL_STATE = [
-  {
-    nick: 'dapelu',
-    subMonths: 3,
-    avatar: 'https://i.pravatar.cc/150?u=dapelu',
-    description: 'A veces es mod'
-  },
-  {
-    nick: 'sergio_serrano',
-    subMonths: 1,
-    avatar: 'https://i.pravatar.cc/150?u=sergio_serrano'
-  }
-]
 
 function App() {
   const [subs, setSubs] = useState<AppState['subs']>([]);
@@ -29,17 +16,43 @@ function App() {
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSubs(INITIAL_STATE)
+    const fetchSubs = (): Promise<SubsResponseFromApi> => {
+      return fetch('https://63e96426811db3d7effb34b1.mockapi.io/api/subs').then(res => res.json())
+    }
+
+    const mapFromApiToSubs = (apiResponse: SubsResponseFromApi): Array<Sub> => {
+      return apiResponse.map(subFromApi => {
+        const {
+          nick,
+          profileUrl: avatar,
+          months: subMonths,
+          description
+        } = subFromApi;
+
+        return {
+          nick,
+          description,
+          avatar,
+          subMonths
+        }
+      })
+    }
+
+    fetchSubs()
+      .then(mapFromApiToSubs)
+      .then(setSubs);
   }, []);
 
   const handleNewSub = (newSub: Sub): void => {
-    setSubs(subs => [...subs, newSub])
+    setSubs(subs => [...subs, newSub]);
+    setNewSubsNumber(n => n + 1);
   }
 
   return (
     <div className="App" ref={divRef}>
       <h1>subs</h1>
       <List subs={subs} />
+      New subs: {newSubsNumber}
       <Form onNewSub={handleNewSub} />
     </div>
   );
