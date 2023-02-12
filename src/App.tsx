@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import Form from './components/Form';
@@ -16,8 +17,9 @@ function App() {
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchSubs = (): Promise<SubsResponseFromApi> => {
-      return fetch('https://63e96426811db3d7effb34b1.mockapi.io/api/subs').then(res => res.json())
+    const fetchSubs = () => {
+      return axios.get<SubsResponseFromApi>('https://63e96426811db3d7effb34b1.mockapi.io/api/subs')
+        .then(res => res.data)
     }
 
     const mapFromApiToSubs = (apiResponse: SubsResponseFromApi): Array<Sub> => {
