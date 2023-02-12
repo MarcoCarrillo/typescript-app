@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import Form from './components/Form';
 import List from './components/List';
-
-interface Sub {
-  nick: string
-  avatar: string
-  subMonths: number
-  description?: string
-}
+import { Sub } from './types';
 
 interface AppState {
   subs: Array<Sub>
@@ -36,10 +31,15 @@ function App() {
     setSubs(INITIAL_STATE)
   }, []);
 
+  const handleNewSub = (newSub: Sub): void => {
+    setSubs(subs => [...subs, newSub])
+  }
+
   return (
     <div className="App">
       <h1>subs</h1>
       <List subs={subs} />
+      <Form onNewSub={handleNewSub} />
     </div>
   );
 }
